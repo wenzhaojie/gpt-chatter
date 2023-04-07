@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with GPT</title>
+    <style>
+        #chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #message-input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <h1>Chat with GPT</h1>
+        <div id="messages"></div>
+        <label for="message-input"></label><input type="text" id="message-input" placeholder="Type your message...">
+    </div>
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const messageInput = document.getElementById('message-input');
+        const messagesDiv = document.getElementById('messages');
+
+        messageInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const userMessage = messageInput.value.trim();
+                if (userMessage) {
+                    addMessage('You', userMessage);
+                    messageInput.value = '';
+
+                    const response = await sendMessage(userMessage);
+                    addMessage('ChatGPT', response);
+                }
+            }
+        });
+
+        function addMessage(user, message) {
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<strong>${user}:</strong> ${message.replace(/\n/g, '<br>')}`;
+            messagesDiv.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage(userInput) {
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_input: userInput }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                return data.response;
+            } else {
+                return 'Error: Unable to reach the server.';
+            }
+        }
+    </script>
+</body>
+</html>
