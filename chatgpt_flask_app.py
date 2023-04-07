@@ -13,12 +13,12 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 global_history = []
 
-def chat_with_gpt(prompt, model="text-davinci-002"):
+def chat_with_gpt(prompt, model="text-davinci-003"):
     completions = openai.Completion.create(
         engine=model,
         prompt=prompt,
-        max_tokens=100,
-        n=1,
+        max_tokens=4000,
+        n=3,
         stop=None,
         temperature=0.5,
     )
