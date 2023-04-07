@@ -11,6 +11,8 @@ app.secret_key = os.urandom(24)
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+global_history = []
+
 def chat_with_gpt(prompt, model="text-davinci-002"):
     completions = openai.Completion.create(
         engine=model,
@@ -54,14 +56,15 @@ def chat():
     session['chat_history'].append(('You', user_input))
     chatgpt_response = chat_with_gpt(user_input)
     session['chat_history'].append(('ChatGPT', chatgpt_response))
+    global_history.append(('You', user_input))
+    global_history.append(('ChatGPT', chatgpt_response))
 
     return jsonify({"response": chatgpt_response, "chat_history": session['chat_history']})
 
 @app.route('/save_history', methods=['POST'])
 def save_history():
     output_filename = "chat_log.md"
-    save_chat_to_markdown(session['chat_history'], output_filename)
-    session.pop('chat_history', None)
+    save_chat_to_markdown(global_history, output_filename)
     return jsonify({"message": f"Chat log saved as Markdown in {output_filename}"})
 
 if __name__ == '__main__':
